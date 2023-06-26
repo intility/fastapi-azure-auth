@@ -37,8 +37,8 @@ class Claims(BaseModel):
         ...,
         description='Specifies the expiration time before which the JWT can be accepted for processing.',
     )
-    aio: str = Field(
-        ...,
+    aio: Optional[str] = Field(
+        default=None,
         description='An internal claim used by Azure AD to record data for token reuse. Resources should not use this claim.',
     )
     name: Optional[str] = Field(
@@ -73,13 +73,13 @@ class Claims(BaseModel):
         ...,
         description='Represents the tenant that the user is signing in to',
     )
-    uti: str = Field(
-        ...,
+    uti: Optional[str] = Field(
+        default=None,
         description='Token identifier claim, equivalent to jti in the JWT specification. Unique, per-token identifier that is case-sensitive.',
     )
-    rh: str = Field(
-        ...,
-        description='An internal claim used by Azure to revalidate tokens. Resources should not use this claim.',
+    rh: Optional[str] = Field(
+        default=None,
+        description='Token identifier claim, equivalent to jti in the JWT specification. Unique, per-token identifier that is case-sensitive.',
     )
     ver: Literal['1.0', '2.0'] = Field(
         ...,
