@@ -16,7 +16,8 @@ ignore=
     D401
     # Type annotation for `self`
     TYP101
-    TYP102  # for cls
+    # for cls
+    TYP102
     # Missing docstring in __init__
     D107
     # Missing docstring in public package
@@ -46,5 +47,4 @@ exclude =
     .idea,
     __pycache__,
     tests/*,
-    venv,
-    manage.py
+    venv
