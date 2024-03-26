@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: "3.11.0"
     - name: Install poetry
@@ -21,7 +21,7 @@ jobs:
         virtualenvs-in-project: true
     - name: Load cached venv
       id: cached-poetry-dependencies
-      uses: actions/cache@v3.3.2
+      uses: actions/cache@v4.0.1
       with:
         path: .venv
         key: venv-${{ runner.os }}-3.11.0-${{ hashFiles('**/poetry.lock') }}-0
@@ -31,7 +31,7 @@ jobs:
     - name: Test with pytest
       run: poetry run pytest --cov=fastapi_azure_auth tests/ --verbose --assert=plain --cov-report=xml
     - name: Upload coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         fail_ci_if_error: true

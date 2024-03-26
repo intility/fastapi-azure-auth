@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: 3.12
       - run: python -m pip install pre-commit
@@ -17,20 +17,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.11.4", "3.12.0" ]
-        fastapi-version: [ "0.103.2"]
-        pydantic-version: [ "1.10.13", "2.4.2"]
-        exclude:
-          # Don't test python 3.12 on old FastAPI versions
-          - fastapi-version: "0.86.0"
-            pydantic-version: "2.1.1"
-          - fastapi-version: "0.95.0"
-            pydantic-version: "2.1.1"
+        python-version: [ "3.11.4", "3.12.2" ]
+        fastapi-version: [ "0.103.2", "0.110.0"]
+        pydantic-version: [ "1.10.13", "2.6.2"]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install poetry
@@ -39,7 +33,7 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
       - name: Load cached venv
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v4.0.1
         id: cache-venv
         with:
           path: .venv

@@ -20,7 +20,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -31,7 +31,7 @@ jobs:
           virtualenvs-in-project: true
 
       - name: Load cached venv
-        uses: actions/cache@v3.3.2
+        uses: actions/cache@v4.0.1
         id: cache-venv
         with:
           path: .venv
