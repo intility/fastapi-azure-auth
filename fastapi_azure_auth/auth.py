@@ -45,6 +45,8 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         openapi_token_url: Optional[str] = None,
         openid_config_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
+        access_token_version_one: bool = False,
+        audience: Optional[str] = None,
     ) -> None:
         """
         Initialize settings.
@@ -92,6 +94,10 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             Override OpenID config URL (used for B2C tenants)
         :param openapi_description: str
             Override OpenAPI description
+        :param access_token_version_one: bool
+            Whether an access token was issued by version 1 STS (sts.windows.net)
+        :param audience: str
+            Override the audience, could be needed when access_token_version_one is set to `True`.
         """
         self.auto_error = auto_error
         # Validate settings, making sure there's no misconfigured dependencies out there
@@ -107,9 +113,14 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             tenant_id=tenant_id,
             multi_tenant=self.multi_tenant,
             app_id=app_client_id if openid_config_use_app_id else None,
-            config_url=openid_config_url or None,
+            config_url=openid_config_url
+            or (
+                f'https://login.microsoftonline.com/{tenant_id}/.well-known/openid-configuration'
+                if access_token_version_one
+                else None
+            ),
         )
-
+        self.audience = audience or app_client_id
         self.leeway: int = leeway
         self.validate_iss: bool = validate_iss
         self.iss_callable: Optional[Callable[..., Any]] = iss_callable
@@ -251,7 +262,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 access_token,
                 key=key,
                 algorithms=[alg],
-                audience=self.app_client_id,
+                audience=self.audience,
                 issuer=iss,
                 leeway=self.leeway,
                 options=options,
@@ -272,6 +283,8 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
+        access_token_version_one: bool = False,
+        audience: Optional[str] = None,
     ) -> None:
         """
         Initialize settings for a single tenant application.
@@ -307,6 +320,10 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             Override OpenAPI token URL
         :param openapi_description: str
             Override OpenAPI description
+        :param access_token_version_one: bool
+            Whether an access token was issued by version 1 STS (sts.windows.net)
+        :param audience: str
+            Override the audience, could be needed when access_token_version_one is set to `True`.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -319,6 +336,8 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
+            access_token_version_one=access_token_version_one,
+            audience=audience,
         )
         self.scheme_name: str = 'AzureAD_PKCE_single_tenant'
 
