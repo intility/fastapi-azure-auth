@@ -359,7 +359,7 @@ import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, computed_field
 from pydantic_settings import BaseSettings
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
