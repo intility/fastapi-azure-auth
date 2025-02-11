@@ -120,7 +120,10 @@ async def test_no_keys_to_decode_with(multi_tenant_app, mock_openid_and_empty_ke
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
+    assert response.json() == {
+        'detail': {'error': 'invalid_token', 'message': 'Unable to verify token, no signing keys found'}
+    }
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -131,7 +134,8 @@ async def test_normal_user_rejected(multi_tenant_app, mock_openid_and_keys):
         headers={'Authorization': 'Bearer ' + build_access_token_normal_user()},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'User is not an AdminUser'}
+    assert response.json() == {'detail': {'error': 'insufficient_scope', 'message': 'User is not an AdminUser'}}
+    assert response.status_code == 403
 
 
 @pytest.mark.anyio
@@ -156,7 +160,8 @@ async def test_invalid_token_claims(multi_tenant_app, mock_openid_and_keys):
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Token contains invalid claims'}
+    assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Token contains invalid claims'}}
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -167,7 +172,10 @@ async def test_no_valid_keys_for_token(multi_tenant_app, mock_openid_and_no_vali
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
+    assert response.json() == {
+        'detail': {'error': 'invalid_token', 'message': 'Unable to verify token, no signing keys found'}
+    }
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -178,7 +186,8 @@ async def test_no_valid_scopes(multi_tenant_app, mock_openid_and_no_valid_keys):
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Required scope missing'}
+    assert response.json() == {'detail': {'error': 'insufficient_scope', 'message': 'Required scope missing'}}
+    assert response.status_code == 403
 
 
 @pytest.mark.anyio
@@ -189,7 +198,8 @@ async def test_no_valid_invalid_scope(multi_tenant_app, mock_openid_and_no_valid
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Required scope missing'}
+    assert response.json() == {'detail': {'error': 'insufficient_scope', 'message': 'Required scope missing'}}
+    assert response.status_code == 403
 
 
 @pytest.mark.anyio
@@ -200,7 +210,10 @@ async def test_no_valid_invalid_formatted_scope(multi_tenant_app, mock_openid_an
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(scopes=None)},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Token contains invalid formatted scopes'}
+    assert response.json() == {
+        'detail': {'error': 'insufficient_scope', 'message': 'Token contains invalid formatted scopes'}
+    }
+    assert response.status_code == 403
 
 
 @pytest.mark.anyio
@@ -211,7 +224,8 @@ async def test_expired_token(multi_tenant_app, mock_openid_and_keys):
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Token signature has expired'}
+    assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Token signature has expired'}}
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -223,7 +237,8 @@ async def test_evil_token(multi_tenant_app, mock_openid_and_keys):
         headers={'Authorization': 'Bearer ' + build_evil_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Unable to validate token'}
+    assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Unable to validate token'}}
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -233,7 +248,8 @@ async def test_malformed_token(multi_tenant_app, mock_openid_and_keys):
         app=app, base_url='http://test', headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'}
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Invalid token format'}
+    assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -248,7 +264,8 @@ async def test_only_header(multi_tenant_app, mock_openid_and_keys):
         },  # {'kid': 'real thumbprint', 'x5t': 'another thumbprint'}
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Invalid token format'}
+    assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -261,7 +278,8 @@ async def test_exception_raised(multi_tenant_app, mock_openid_and_keys, mocker):
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Unable to process token'}
+    assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Unable to process token'}}
+    assert response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -285,4 +303,7 @@ async def test_change_of_keys_works(multi_tenant_app, mock_openid_ok_then_empty,
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
     ) as ac:
         second_resonse = await ac.get('api/v1/hello')
-    assert second_resonse.json() == {'detail': 'Unable to verify token, no signing keys found'}
+    assert second_resonse.json() == {
+        'detail': {'error': 'invalid_token', 'message': 'Unable to verify token, no signing keys found'}
+    }
+    assert second_resonse.status_code == 401

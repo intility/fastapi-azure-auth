@@ -17,7 +17,16 @@ from jwt.exceptions import (
 )
 from starlette.requests import HTTPConnection
 
-from fastapi_azure_auth.exceptions import InvalidAuth, InvalidAuthHttp, InvalidAuthWebSocket
+from fastapi_azure_auth.exceptions import (
+    Forbidden,
+    ForbiddenHttp,
+    ForbiddenWebSocket,
+    InvalidRequest,
+    InvalidRequestHttp,
+    Unauthorized,
+    UnauthorizedHttp,
+    UnauthorizedWebSocket,
+)
 from fastapi_azure_auth.openid_config import OpenIdConfig
 from fastapi_azure_auth.user import User
 from fastapi_azure_auth.utils import get_unverified_claims, get_unverified_header, is_guest
@@ -148,28 +157,28 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             access_token = await self.extract_access_token(request)
             try:
                 if access_token is None:
-                    raise InvalidAuth('No access token provided', request=request)
+                    raise InvalidRequest('No access token provided', request=request)
                 # Extract header information of the token.
                 header: dict[str, Any] = get_unverified_header(access_token)
                 claims: dict[str, Any] = get_unverified_claims(access_token)
             except Exception as error:
                 log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
-                raise InvalidAuth(detail='Invalid token format', request=request) from error
+                raise Unauthorized(detail='Invalid token format', request=request) from error
 
             user_is_guest: bool = is_guest(claims=claims)
             if not self.allow_guest_users and user_is_guest:
                 log.info('User denied, is a guest user', claims)
-                raise InvalidAuth(detail='Guest users not allowed', request=request)
+                raise Forbidden(detail='Guest users not allowed', request=request)
 
             for scope in security_scopes.scopes:
                 token_scope_string = claims.get('scp', '')
                 log.debug('Scopes: %s', token_scope_string)
                 if not isinstance(token_scope_string, str):
-                    raise InvalidAuth('Token contains invalid formatted scopes', request=request)
+                    raise Forbidden('Token contains invalid formatted scopes', request=request)
 
                 token_scopes = token_scope_string.split(' ')
                 if scope not in token_scopes:
-                    raise InvalidAuth('Required scope missing', request=request)
+                    raise Forbidden('Required scope missing', request=request)
             # Load new config if old
             await self.openid_config.load_config()
 
@@ -211,27 +220,34 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 MissingRequiredClaimError,
             ) as error:
                 log.info('Token contains invalid claims. %s', error)
-                raise InvalidAuth(detail='Token contains invalid claims', request=request) from error
+                raise Unauthorized(detail='Token contains invalid claims', request=request) from error
             except ExpiredSignatureError as error:
                 log.info('Token signature has expired. %s', error)
-                raise InvalidAuth(detail='Token signature has expired', request=request) from error
+                raise Unauthorized(detail='Token signature has expired', request=request) from error
             except InvalidTokenError as error:
                 log.warning('Invalid token. Error: %s', error, exc_info=True)
-                raise InvalidAuth(detail='Unable to validate token', request=request) from error
+                raise Unauthorized(detail='Unable to validate token', request=request) from error
             except Exception as error:
                 # Extra failsafe in case of a bug in a future version of the jwt library
                 log.exception('Unable to process jwt token. Uncaught error: %s', error)
-                raise InvalidAuth(detail='Unable to process token', request=request) from error
+                raise Unauthorized(detail='Unable to process token', request=request) from error
             log.warning('Unable to verify token. No signing keys found')
-            raise InvalidAuth(detail='Unable to verify token, no signing keys found', request=request)
-        except (InvalidAuthHttp, InvalidAuthWebSocket, HTTPException):
+            raise Unauthorized(detail='Unable to verify token, no signing keys found', request=request)
+        except (
+            InvalidRequestHttp,
+            UnauthorizedHttp,
+            UnauthorizedWebSocket,
+            ForbiddenHttp,
+            ForbiddenWebSocket,
+            HTTPException,
+        ):
             if not self.auto_error:
                 return None
             raise
         except Exception as error:
             if not self.auto_error:
                 return None
-            raise InvalidAuth(detail='Unable to validate token', request=request) from error
+            raise InvalidRequest(detail='Unable to validate token', request=request) from error
 
     async def extract_access_token(self, request: HTTPConnection) -> Optional[str]:
         """
