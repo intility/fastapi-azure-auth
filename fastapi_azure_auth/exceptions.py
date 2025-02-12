@@ -62,6 +62,40 @@ class ForbiddenWebSocket(WebSocketException):
         )
 
 
+#  --- start backwards-compatible code ---
+def InvalidAuth(detail: str, request: HTTPConnection) -> UnauthorizedHttp | UnauthorizedWebSocket:
+    """
+    Legacy factory function that maps to Unauthorized for backwards compatibility.
+    Returns the correct exception based on the connection type.
+    TODO: Remove in v6.0.0
+    """
+    if request.scope['type'] == 'http':
+        # Convert the legacy format to new format
+        return UnauthorizedHttp(detail)
+    return UnauthorizedWebSocket(detail)
+
+
+class InvalidAuthHttp(UnauthorizedHttp):
+    """Legacy HTTP exception class that maps to UnauthorizedHttp
+    TODO: Remove in v6.0.0
+    """
+
+    def __init__(self, detail: str) -> None:
+        super().__init__(detail)
+
+
+class InvalidAuthWebSocket(UnauthorizedWebSocket):
+    """Legacy WebSocket exception class that maps to UnauthorizedWebSocket
+    TODO: Remove in v6.0.0
+    """
+
+    def __init__(self, detail: str) -> None:
+        super().__init__(detail)
+
+
+#  --- end backwards-compatible code ---
+
+
 def InvalidRequest(detail: str, request: HTTPConnection) -> InvalidRequestHttp | InvalidRequestWebSocket:
     """Factory function for invalid request exceptions (HTTP only, as request validation happens pre-connection)"""
     if request.scope['type'] == 'http':

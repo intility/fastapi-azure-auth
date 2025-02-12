@@ -21,6 +21,8 @@ from fastapi_azure_auth.exceptions import (
     Forbidden,
     ForbiddenHttp,
     ForbiddenWebSocket,
+    InvalidAuthHttp,
+    InvalidAuthWebSocket,
     InvalidRequest,
     InvalidRequestHttp,
     Unauthorized,
@@ -234,6 +236,8 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             log.warning('Unable to verify token. No signing keys found')
             raise Unauthorized(detail='Unable to verify token, no signing keys found', request=request)
         except (
+            InvalidAuthHttp,
+            InvalidAuthWebSocket,
             InvalidRequestHttp,
             UnauthorizedHttp,
             UnauthorizedWebSocket,
