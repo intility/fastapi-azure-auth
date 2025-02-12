@@ -13,9 +13,9 @@ class AzureActiveDirectory(BaseSettings):  # type: ignore[misc, valid-type]
     OPENAPI_CLIENT_ID: str = Field(default='')
     TENANT_ID: str = Field(default='')
     APP_CLIENT_ID: str = Field(default='')
-    AUTH_URL: AnyHttpUrl = Field(default='https://dummy.com/')
-    CONFIG_URL: AnyHttpUrl = Field(default='https://dummy.com/')
-    TOKEN_URL: AnyHttpUrl = Field(default='https://dummy.com/')
+    AUTH_URL: AnyHttpUrl = Field(default=AnyHttpUrl('https://dummy.com/'))
+    CONFIG_URL: AnyHttpUrl = Field(default=AnyHttpUrl('https://dummy.com/'))
+    TOKEN_URL: AnyHttpUrl = Field(default=AnyHttpUrl('https://dummy.com/'))
     GRAPH_SECRET: str = Field(default='')
     CLIENT_SECRET: str = Field(default='')
 

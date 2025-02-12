@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
-from fastapi_azure_auth.exceptions import InvalidAuth
+from fastapi_azure_auth.exceptions import Unauthorized
 
 
 class Settings(BaseSettings):
@@ -56,7 +56,7 @@ async def check_if_valid_tenant(tid: str) -> str:
     try:
         return tid_to_iss_mapping[tid]
     except KeyError:
-        raise InvalidAuth('Tenant not allowed')
+        raise Unauthorized('Tenant not allowed')
 
 azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 ```
 
 We're first creating an `async function`, which takes a `tid` as an argument, and returns the tenant ID's `iss` if it's a valid tenant.
-If it's not a valid tenant, it has to raise an `InvalidAuth()` exception.
+If it's not a valid tenant, it has to raise an `Unauthorized()` exception.
 
 ## More sophisticated callable
 If you want to cache these results in memory, you can do so by creating a more sophisticated callable:
@@ -103,7 +103,7 @@ class IssuerFetcher:
     async def __call__(self, tid: str) -> str:
         """
         Check if memory cache needs to be updated or not, and then returns an issuer for a given tenant
-        :raises InvalidAuth when it's not a valid tenant
+        :raises Unauthorized when it's not a valid tenant
         """
         refresh_time = datetime.now() - timedelta(hours=1)
         if not self._config_timestamp or self._config_timestamp < refresh_time:
@@ -117,7 +117,7 @@ class IssuerFetcher:
             return self.tid_to_iss[tid]
         except Exception as error:
             log.exception('`iss` not found for `tid` %s. Error %s', tid, error)
-            raise InvalidAuth('You must be an Intility customer to access this resource')
+            raise Unauthorized('You must be an Intility customer to access this resource')
 
 
 issuer_fetcher = IssuerFetcher()

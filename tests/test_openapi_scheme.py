@@ -476,4 +476,4 @@ def test_incorrect_token(test_client):
 def test_token(test_client):
     response = test_client.get('/api/v1/hello', headers={'Authorization': 'Bearer '})
     assert response.status_code == 401, response.text
-    assert response.json() == {'detail': 'Invalid token format'}
+    assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
