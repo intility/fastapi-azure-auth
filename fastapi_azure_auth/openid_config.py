@@ -1,5 +1,5 @@
-import asyncio
 import logging
+from asyncio import Lock
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
@@ -32,12 +32,13 @@ class OpenIdConfig:
         self.token_endpoint: str
         self.issuer: str
 
-        self._lock = asyncio.Lock()
+        self._lock: Lock | None = None
 
     async def load_config(self) -> None:
         """
         Loads config from the Intility openid-config endpoint if it's over 24 hours old (or don't exist)
         """
+        self._lock = Lock() if not self._lock else self._lock
         async with self._lock:
             refresh_time = datetime.now() - timedelta(hours=24)
             if not self._config_timestamp or self._config_timestamp < refresh_time:
