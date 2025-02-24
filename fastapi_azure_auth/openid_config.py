@@ -12,6 +12,8 @@ if TYPE_CHECKING:  # pragma: no cover
 
 log = logging.getLogger('fastapi_azure_auth')
 
+refresh_lock: Lock = Lock()
+
 
 class OpenIdConfig:
     def __init__(
@@ -32,14 +34,11 @@ class OpenIdConfig:
         self.token_endpoint: str
         self.issuer: str
 
-        self._lock: Lock | None = None
-
     async def load_config(self) -> None:
         """
         Loads config from the Intility openid-config endpoint if it's over 24 hours old (or don't exist)
         """
-        self._lock = Lock() if not self._lock else self._lock
-        async with self._lock:
+        async with refresh_lock:
             refresh_time = datetime.now() - timedelta(hours=24)
             if not self._config_timestamp or self._config_timestamp < refresh_time:
                 try:
