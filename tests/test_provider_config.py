@@ -1,11 +1,14 @@
+import asyncio
 from datetime import datetime, timedelta
 
+import httpx
 import pytest
+import respx
 from asgi_lifespan import LifespanManager
 from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
 from httpx import AsyncClient
-from tests.utils import build_access_token, build_openid_keys, openid_configuration
+from tests.utils import build_access_token, build_openid_keys, keys_url, openid_config_url, openid_configuration
 
 from fastapi_azure_auth.openid_config import OpenIdConfig
 
@@ -64,3 +67,28 @@ async def test_custom_config_id(respx_mock):
     )
     await openid_config.load_config()
     assert len(openid_config.signing_keys) == 2
+
+
+async def test_concurrent_refresh_requests():
+    """Test that concurrent refreshes are handled correctly"""
+    with respx.mock(assert_all_called=True) as mock:
+
+        async def slow_config_response(*args, **kwargs):
+            await asyncio.sleep(0.2)
+            return httpx.Response(200, json=openid_configuration())
+
+        async def slow_keys_response(*args, **kwargs):
+            await asyncio.sleep(0.2)
+            return httpx.Response(200, json=build_openid_keys())
+
+        config_route = mock.get(openid_config_url()).mock(side_effect=slow_config_response)
+        keys_route = mock.get(keys_url()).mock(side_effect=slow_keys_response)
+
+        azure_scheme.openid_config._config_timestamp = None
+
+        tasks = [azure_scheme.openid_config.load_config() for _ in range(5)]
+        await asyncio.gather(*tasks)
+
+        assert len(config_route.calls) == 1, "Config endpoint called multiple times"
+        assert len(keys_route.calls) == 1, "Keys endpoint called multiple times"
+        assert len(azure_scheme.openid_config.signing_keys) == 2
