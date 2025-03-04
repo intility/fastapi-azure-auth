@@ -25,11 +25,16 @@ class InvalidRequestWebSocket(WebSocketException):
 class UnauthorizedHttp(HTTPException):
     """HTTP exception for authentication failures"""
 
-    def __init__(self, detail: str) -> None:
+    def __init__(self, detail: str, authorization_url: str | None = None, client_id: str | None = None) -> None:
+        header_value = 'Bearer'
+        if authorization_url:
+            header_value += f', authorization_uri="{authorization_url}"'
+        if client_id:
+            header_value += f', client_id="{client_id}"'
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={"error": "invalid_token", "message": detail},
-            headers={"WWW-Authenticate": "Bearer"},
+            headers={"WWW-Authenticate": header_value},
         )
 
 
@@ -103,10 +108,12 @@ def InvalidRequest(detail: str, request: HTTPConnection) -> InvalidRequestHttp |
     return InvalidRequestWebSocket(detail)
 
 
-def Unauthorized(detail: str, request: HTTPConnection) -> UnauthorizedHttp | UnauthorizedWebSocket:
+def Unauthorized(
+    detail: str, request: HTTPConnection, authorization_url: str | None = None, client_id: str | None = None
+) -> UnauthorizedHttp | UnauthorizedWebSocket:
     """Factory function for unauthorized exceptions"""
     if request.scope["type"] == "http":
-        return UnauthorizedHttp(detail)
+        return UnauthorizedHttp(detail, authorization_url, client_id)
     return UnauthorizedWebSocket(detail)
 
 

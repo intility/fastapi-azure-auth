@@ -165,7 +165,12 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 claims: dict[str, Any] = get_unverified_claims(access_token)
             except Exception as error:
                 log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
-                raise Unauthorized(detail='Invalid token format', request=request) from error
+                raise Unauthorized(
+                    detail='Invalid token format',
+                    client_id=self.app_client_id,
+                    authorization_url=self.authorization_url,
+                    request=request,
+                ) from error
 
             user_is_guest: bool = is_guest(claims=claims)
             if not self.allow_guest_users and user_is_guest:
