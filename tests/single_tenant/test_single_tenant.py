@@ -316,3 +316,18 @@ async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty
         'detail': {'error': 'invalid_token', 'message': 'Unable to verify token, no signing keys found'}
     }
     assert second_resonse.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_authentication_params_from_header(single_tenant_app):
+    """
+    * Send request with "Authorization: Bearer"
+    * Validate response provides authorization uri and client id in header
+    """
+    async with AsyncClient(app=app, base_url='http://test', headers={'Authorization': 'Bearer'}) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.status_code == 401
+    assert (
+        response.headers['www-authenticate']
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+    )
