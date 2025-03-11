@@ -123,6 +123,7 @@ async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_k
         'detail': {'error': 'invalid_token', 'message': 'Unable to verify token, no signing keys found'}
     }
     assert response.status_code == 401
+    assert response.headers['www-authenticate'] == 'Bearer'
 
 
 @pytest.mark.anyio
@@ -159,6 +160,7 @@ async def test_invalid_token_claims(single_tenant_app, mock_openid_and_keys):
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Token contains invalid claims'}}
     assert response.status_code == 401
+    assert response.headers['www-authenticate'] == 'Bearer'
 
 
 @pytest.mark.anyio
@@ -173,6 +175,7 @@ async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_val
         'detail': {'error': 'invalid_token', 'message': 'Unable to verify token, no signing keys found'}
     }
     assert response.status_code == 401
+    assert response.headers['www-authenticate'] == 'Bearer'
 
 
 @pytest.mark.anyio
@@ -211,6 +214,7 @@ async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_a
         'detail': {'error': 'insufficient_scope', 'message': 'Token contains invalid formatted scopes'}
     }
     assert response.status_code == 403
+    assert response.headers['www-authenticate'] == 'Bearer'
 
 
 @pytest.mark.anyio
@@ -223,6 +227,7 @@ async def test_expired_token(single_tenant_app, mock_openid_and_keys):
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Token signature has expired'}}
     assert response.status_code == 401
+    assert response.headers['www-authenticate'] == 'Bearer'
 
 
 @pytest.mark.anyio
@@ -236,6 +241,7 @@ async def test_evil_token(single_tenant_app, mock_openid_and_keys):
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Unable to validate token'}}
     assert response.status_code == 401
+    assert response.headers['www-authenticate'] == 'Bearer'
 
 
 @pytest.mark.anyio
@@ -247,6 +253,10 @@ async def test_malformed_token(single_tenant_app, mock_openid_and_keys):
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
     assert response.status_code == 401
+    assert (
+        response.headers['www-authenticate']
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+    )
 
 
 @pytest.mark.anyio
@@ -263,6 +273,10 @@ async def test_only_header(single_tenant_app, mock_openid_and_keys):
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
     assert response.status_code == 401
+    assert (
+        response.headers['www-authenticate']
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+    )
 
 
 @pytest.mark.anyio
@@ -276,6 +290,10 @@ async def test_none_token(single_tenant_app, mock_openid_and_keys, mocker):
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
     assert response.status_code == 401
+    assert (
+        response.headers['www-authenticate']
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+    )
 
 
 @pytest.mark.anyio
@@ -289,6 +307,8 @@ async def test_exception_raised(single_tenant_app, mock_openid_and_keys, mocker)
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Unable to process token'}}
     assert response.status_code == 401
+    print(f"header: {response.headers.get('www-authenticate')}")
+    assert response.headers['www-authenticate'] == 'Bearer'
 
 
 @pytest.mark.anyio
@@ -316,6 +336,7 @@ async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty
         'detail': {'error': 'invalid_token', 'message': 'Unable to verify token, no signing keys found'}
     }
     assert second_resonse.status_code == 401
+    assert 'www-authenticate' not in response.headers
 
 
 @pytest.mark.anyio
