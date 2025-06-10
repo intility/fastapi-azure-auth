@@ -35,7 +35,7 @@ classifiers = [
     'License :: OSI Approved :: MIT License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
-    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
@@ -43,7 +43,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 fastapi = ">0.68.0"
 cryptography = ">=43.0.1"
 httpx = ">0.18.2"
@@ -75,7 +75,7 @@ asgi-lifespan = "^2.1.0"
 [tool.black]
 line-length = 120
 skip-string-normalization = true
-target-version = ['py38']
+target-version = ['py310']
 include = '\.pyi?$'
 exclude = '''
 (
