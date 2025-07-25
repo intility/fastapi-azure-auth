@@ -9,7 +9,7 @@ from httpx import AsyncClient
 if TYPE_CHECKING:  # pragma: no cover
     from jwt.algorithms import AllowedPublicKeys
 
-log = logging.getLogger("fastapi_azure_auth")
+log = logging.getLogger('fastapi_azure_auth')
 
 
 class OpenIdConfig:
@@ -27,7 +27,7 @@ class OpenIdConfig:
         self.config_url = config_url
 
         self.authorization_endpoint: str
-        self.signing_keys: dict[str, "AllowedPublicKeys"]
+        self.signing_keys: dict[str, 'AllowedPublicKeys']
         self.token_endpoint: str
         self.issuer: str
 
@@ -38,55 +38,55 @@ class OpenIdConfig:
         refresh_time = datetime.now() - timedelta(hours=24)
         if not self._config_timestamp or self._config_timestamp < refresh_time:
             try:
-                log.debug("Loading Azure Entra ID OpenID configuration.")
+                log.debug('Loading Azure Entra ID OpenID configuration.')
                 await self._load_openid_config()
                 self._config_timestamp = datetime.now()
             except Exception as error:
-                log.exception("Unable to fetch OpenID configuration from Azure Entra ID. Error: %s", error)
+                log.exception('Unable to fetch OpenID configuration from Azure Entra ID. Error: %s', error)
                 # We can't fetch an up to date openid-config, so authentication will not work.
                 if self._config_timestamp:
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Connection to Azure Entra ID is down. Unable to fetch provider configuration",
-                        headers={"WWW-Authenticate": "Bearer"},
+                        detail='Connection to Azure Entra ID is down. Unable to fetch provider configuration',
+                        headers={'WWW-Authenticate': 'Bearer'},
                     ) from error
 
                 else:
-                    raise RuntimeError(f"Unable to fetch provider information. {error}") from error
+                    raise RuntimeError(f'Unable to fetch provider information. {error}') from error
 
-            log.info("fastapi-azure-auth loaded settings from Azure Entra ID.")
-            log.info("authorization endpoint: %s", self.authorization_endpoint)
-            log.info("token endpoint:         %s", self.token_endpoint)
-            log.info("issuer:                 %s", self.issuer)
+            log.info('fastapi-azure-auth loaded settings from Azure Entra ID.')
+            log.info('authorization endpoint: %s', self.authorization_endpoint)
+            log.info('token endpoint:         %s', self.token_endpoint)
+            log.info('issuer:                 %s', self.issuer)
 
     async def _load_openid_config(self) -> None:
         """
         Load openid config, fetch signing keys
         """
-        path = "common" if self.multi_tenant else self.tenant_id
+        path = 'common' if self.multi_tenant else self.tenant_id
 
         if self.config_url:
             config_url = self.config_url
         else:
-            config_url = f"https://login.microsoftonline.com/{path}/v2.0/.well-known/openid-configuration"
+            config_url = f'https://login.microsoftonline.com/{path}/v2.0/.well-known/openid-configuration'
         if self.app_id:
-            config_url += f"?appid={self.app_id}"
+            config_url += f'?appid={self.app_id}'
 
         async with AsyncClient(timeout=10) as client:
-            log.info("Fetching OpenID Connect config from %s", config_url)
+            log.info('Fetching OpenID Connect config from %s', config_url)
             openid_response = await client.get(config_url)
             openid_response.raise_for_status()
             openid_cfg = openid_response.json()
 
-            self.authorization_endpoint = openid_cfg["authorization_endpoint"]
-            self.token_endpoint = openid_cfg["token_endpoint"]
-            self.issuer = openid_cfg["issuer"]
+            self.authorization_endpoint = openid_cfg['authorization_endpoint']
+            self.token_endpoint = openid_cfg['token_endpoint']
+            self.issuer = openid_cfg['issuer']
 
-            jwks_uri = openid_cfg["jwks_uri"]
-            log.info("Fetching jwks from %s", jwks_uri)
+            jwks_uri = openid_cfg['jwks_uri']
+            log.info('Fetching jwks from %s', jwks_uri)
             jwks_response = await client.get(jwks_uri)
             jwks_response.raise_for_status()
-            self._load_keys(jwks_response.json()["keys"])
+            self._load_keys(jwks_response.json()['keys'])
 
     def _load_keys(self, keys: List[Dict[str, Any]]) -> None:
         """
@@ -94,8 +94,8 @@ class OpenIdConfig:
         """
         self.signing_keys = {}
         for key in keys:
-            if key.get("use") == "sig":  # Only care about keys that are used for signatures, not encryption
-                log.debug("Loading public key from certificate: %s", key)
-                cert_obj = jwt.PyJWK(key, "RS256")
-                if kid := key.get("kid"):  # In case a key would not have a thumbprint we can match, we don't want it.
+            if key.get('use') == 'sig':  # Only care about keys that are used for signatures, not encryption
+                log.debug('Loading public key from certificate: %s', key)
+                cert_obj = jwt.PyJWK(key, 'RS256')
+                if kid := key.get('kid'):  # In case a key would not have a thumbprint we can match, we don't want it.
                     self.signing_keys[kid] = cert_obj.key

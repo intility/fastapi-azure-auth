@@ -8,11 +8,11 @@ def is_guest(claims: Dict[str, Any]) -> bool:
     Check if the user is a guest user
     """
     # if the user has set up `acct` claim in Azure, that's most efficient. 0 = tenant member, 1 = guest
-    if claims.get("acct") == 1:
+    if claims.get('acct') == 1:
         return True
     # formula: idp exist and idp != iss: guest user
-    claims_iss: str = claims.get("iss", "")
-    idp: str = claims.get("idp", claims_iss)
+    claims_iss: str = claims.get('iss', '')
+    idp: str = claims.get('idp', claims_iss)
     return idp != claims_iss
 
 
@@ -27,4 +27,4 @@ def get_unverified_claims(access_token: str) -> Dict[str, Any]:
     """
     Get claims from the access token without verifying the signature
     """
-    return dict(jwt.decode(access_token, options={"verify_signature": False}))
+    return dict(jwt.decode(access_token, options={'verify_signature': False}))

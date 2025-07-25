@@ -23,15 +23,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    swagger_ui_oauth2_redirect_url="/oauth2-redirect",
+    openapi_url=f'{settings.API_V1_STR}/openapi.json',
+    swagger_ui_oauth2_redirect_url='/oauth2-redirect',
     swagger_ui_init_oauth={
-        "usePkceWithAuthorizationCodeGrant": True,
-        "clientId": settings.OPENAPI_CLIENT_ID,
-        "additionalQueryStringParams": {"prompt": "consent"},
+        'usePkceWithAuthorizationCodeGrant': True,
+        'clientId': settings.OPENAPI_CLIENT_ID,
+        'additionalQueryStringParams': {'prompt': 'consent'},
     },
-    version="1.0.0",
-    description="## Welcome to my API! \n This is my description, written in `markdown`",
+    version='1.0.0',
+    description='## Welcome to my API! \n This is my description, written in `markdown`',
     title=settings.PROJECT_NAME,
     lifespan=lifespan,
 )
@@ -43,15 +43,15 @@ if settings.BACKEND_CORS_ORIGINS:  # pragma: no cover
         CORSMiddleware,
         allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=['*'],
+        allow_headers=['*'],
     )
 
 
 app.include_router(
     api_router_azure_auth,
     prefix=settings.API_V1_STR,
-    dependencies=[Security(azure_scheme, scopes=["user_impersonation"])],
+    dependencies=[Security(azure_scheme, scopes=['user_impersonation'])],
 )
 app.include_router(
     api_router_multi_auth,
@@ -65,12 +65,12 @@ app.include_router(
 )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument("--api", action="store_true")
-    parser.add_argument("--reload", action="store_true")
+    parser.add_argument('--api', action='store_true')
+    parser.add_argument('--reload', action='store_true')
     args = parser.parse_args()
     if args.api:
-        uvicorn.run("main:app", reload=args.reload)
+        uvicorn.run('main:app', reload=args.reload)
     else:
-        raise ValueError("No valid combination of arguments provided.")
+        raise ValueError('No valid combination of arguments provided.')

@@ -60,7 +60,7 @@ def generate_azure_scheme_multi_tenant_b2c_object(issuer=None):
     """
 
     async def issuer_fetcher(tid):
-        tids = {"intility_tenant_id": "https://login.microsoftonline.com/intility_tenant/v2.0"}
+        tids = {'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0'}
         return tids[tid]
 
     current_issuer = issuer_fetcher
@@ -72,9 +72,9 @@ def generate_azure_scheme_multi_tenant_b2c_object(issuer=None):
         openapi_token_url=str(settings.TOKEN_URL),
         # The value below is used only for testing purpose you should use:
         # https://login.microsoftonline.com/common/v2.0/oauth2/token
-        openid_config_url="https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration",
+        openid_config_url='https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
         scopes={
-            f"api://{settings.APP_CLIENT_ID}/user_impersonation": "User impersonation",
+            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
         },
         validate_iss=True,
         iss_callable=current_issuer,

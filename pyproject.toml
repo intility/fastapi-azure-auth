@@ -77,6 +77,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.ruff]
+fix = true
 line-length = 120
 target-version = 'py39'
 include = ['\.pyi?$']
@@ -85,6 +86,11 @@ exclude = ['''
     (\.eggs|\.git|\.hg|\.mypy_cache|\.tox|\.venv|\venv|\.github|\docs|\tests|\__pycache__)
 )
 ''']
+
+[tool.ruff.format]
+docstring-code-format = true
+line-ending = "lf"
+quote-style = "single"
 
 [tool.isort]
 profile = "black"
