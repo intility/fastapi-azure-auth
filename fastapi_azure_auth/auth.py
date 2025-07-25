@@ -56,6 +56,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         openapi_token_url: Optional[str] = None,
         openid_config_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
+        scheme_name: str = "AzureAuthorizationCodeBearerBase",
     ) -> None:
         """
         Initialize settings.
@@ -103,6 +104,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             Override OpenID config URL (used for B2C tenants)
         :param openapi_description: str
             Override OpenAPI description
+        :param scheme_name: str
+            The name of the security scheme to be used in OpenAPI documentation.
+            Default is 'AzureAuthorizationCodeBearerBase'.
         """
         self.auto_error = auto_error
         # Validate settings, making sure there's no misconfigured dependencies out there
@@ -145,7 +149,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             authorizationUrl=self.authorization_url,
             tokenUrl=self.token_url,
             scopes=scopes,
-            scheme_name="AzureAuthorizationCodeBearerBase",
+            scheme_name=scheme_name,
             description=openapi_description or "`Leave client_secret blank`",
             auto_error=True,  # We catch this exception in __call__
         )
@@ -297,6 +301,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
+        scheme_name: str = "AzureAD_PKCE_single_tenant",
     ) -> None:
         """
         Initialize settings for a single tenant application.
@@ -332,6 +337,9 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             Override OpenAPI token URL
         :param openapi_description: str
             Override OpenAPI description
+        :param scheme_name: str
+            The name of the security scheme to be used in OpenAPI documentation.
+            Default is 'AzureAD_PKCE_single_tenant'.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -345,7 +353,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name: str = "AzureAD_PKCE_single_tenant"
+        self.scheme_name: str = scheme_name
 
 
 class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
@@ -362,6 +370,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
+        scheme_name: str = "AzureAD_PKCE_multi_tenant",
     ) -> None:
         """
         Initialize settings for a multi-tenant application.
@@ -402,6 +411,9 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             Override OpenAPI token URL
         :param openapi_description: str
             Override OpenAPI description
+        :param scheme_name: str
+            The name of the security scheme to be used in OpenAPI documentation.
+            Default is 'AzureAD_PKCE_multi_tenant'.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -417,7 +429,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name: str = "AzureAD_PKCE_multi_tenant"
+        self.scheme_name: str = scheme_name
 
 
 class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
@@ -434,6 +446,7 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
+        scheme_name: str = "AzureAD_PKCE_B2C_multi_tenant",
     ) -> None:
         """
         Initialize settings for a B2C multi-tenant application.
@@ -469,6 +482,9 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             Override OpenAPI token URL
         :param openapi_description: str
             Override OpenAPI description
+        :param scheme_name: str
+            The name of the security scheme to be used in OpenAPI documentation.
+            Default is 'AzureAD_PKCE_B2C_multi_tenant'.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -485,4 +501,4 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name: str = "AzureAD_PKCE_B2C_multi_tenant"
+        self.scheme_name: str = scheme_name
