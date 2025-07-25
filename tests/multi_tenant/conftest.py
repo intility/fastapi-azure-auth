@@ -67,7 +67,7 @@ def generate_azure_scheme_multi_tenant_object(issuer=None, auto_error=True):
     """
 
     async def issuer_fetcher(tid):
-        tids = {'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0'}
+        tids = {"intility_tenant_id": "https://login.microsoftonline.com/intility_tenant/v2.0"}
         return tids[tid]
 
     current_issuer = issuer_fetcher
@@ -76,7 +76,7 @@ def generate_azure_scheme_multi_tenant_object(issuer=None, auto_error=True):
     return MultiTenantAzureAuthorizationCodeBearer(
         app_client_id=settings.APP_CLIENT_ID,
         scopes={
-            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
+            f"api://{settings.APP_CLIENT_ID}/user_impersonation": "User impersonation",
         },
         validate_iss=True,
         iss_callable=current_issuer,

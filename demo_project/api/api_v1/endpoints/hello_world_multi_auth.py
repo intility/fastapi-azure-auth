@@ -10,11 +10,11 @@ router = APIRouter()
 
 
 @router.get(
-    '/hello-multi-auth',
+    "/hello-multi-auth",
     response_model=TokenType,
-    summary='Say hello with an API key',
-    name='hello_world_api_key',
-    operation_id='helloWorldApiKeyMultiAuth',
+    summary="Say hello with an API key",
+    name="hello_world_api_key",
+    operation_id="helloWorldApiKeyMultiAuth",
 )
 async def world(request: Request, auth: Union[str, User] = Depends(multi_auth)) -> Dict[str, bool]:
     """
@@ -22,16 +22,16 @@ async def world(request: Request, auth: Union[str, User] = Depends(multi_auth)) 
     """
     if isinstance(auth, str):
         # An API key was used
-        return {'api_key': True, 'azure_auth': False}
-    return {'api_key': False, 'azure_auth': True}
+        return {"api_key": True, "azure_auth": False}
+    return {"api_key": False, "azure_auth": True}
 
 
 @router.get(
-    '/hello-multi-auth-b2c',
+    "/hello-multi-auth-b2c",
     response_model=TokenType,
-    summary='Say hello with an API key',
-    name='hello_world_api_key',
-    operation_id='helloWorldApiKeyMultiAuthB2C',
+    summary="Say hello with an API key",
+    name="hello_world_api_key",
+    operation_id="helloWorldApiKeyMultiAuthB2C",
 )
 async def world_b2c(request: Request, auth: Union[str, User] = Depends(multi_auth_b2c)) -> Dict[str, bool]:
     """
@@ -39,5 +39,5 @@ async def world_b2c(request: Request, auth: Union[str, User] = Depends(multi_aut
     """
     if isinstance(auth, str):
         # An API key was used
-        return {'api_key': True, 'azure_auth': False}
-    return {'api_key': False, 'azure_auth': True}
+        return {"api_key": True, "azure_auth": False}
+    return {"api_key": False, "azure_auth": True}

@@ -10,11 +10,11 @@ router = APIRouter()
 
 
 @router.get(
-    '/hello',
+    "/hello",
     response_model=HelloWorldResponse,
-    summary='Say hello',
-    name='hello_world',
-    operation_id='helloWorld',
+    summary="Say hello",
+    name="hello_world",
+    operation_id="helloWorld",
     dependencies=[Depends(validate_is_admin_user)],
 )
 async def world(request: Request) -> Dict[str, Union[str, User]]:
@@ -22,4 +22,4 @@ async def world(request: Request) -> Dict[str, Union[str, User]]:
     Wonder who we say hello to?
     """
     user: User = request.state.user
-    return {'hello': 'world', 'user': user}
+    return {"hello": "world", "user": user}

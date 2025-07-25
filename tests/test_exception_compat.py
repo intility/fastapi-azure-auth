@@ -3,6 +3,7 @@ This module tests the exception handling and backwards compatibility of the exce
 issue https://github.com/intility/fastapi-azure-auth/issues/229.
 TODO: Remove this test module in v6.0.0
 """
+
 import pytest
 from fastapi import HTTPException, WebSocketException, status
 
@@ -18,10 +19,10 @@ from fastapi_azure_auth.exceptions import (
 def test_invalid_auth_backwards_compatibility():
     """Test that InvalidAuth maps to correct exceptions and maintains format"""
     # Mock HTTP request scope
-    http_conn = type('HTTPConnection', (), {'scope': {'type': 'http'}})()
+    http_conn = type("HTTPConnection", (), {"scope": {"type": "http"}})()
 
     # Mock WebSocket scope
-    ws_conn = type('HTTPConnection', (), {'scope': {'type': 'websocket'}})()
+    ws_conn = type("HTTPConnection", (), {"scope": {"type": "websocket"}})()
 
     # Test HTTP path
     http_exc = InvalidAuth("test message", http_conn)
@@ -41,7 +42,7 @@ def test_invalid_auth_backwards_compatibility():
 def test_legacy_exception_catching():
     """Test that old exception catching patterns still work"""
     # Test HTTP exceptions
-    http_conn = type('HTTPConnection', (), {'scope': {'type': 'http'}})()
+    http_conn = type("HTTPConnection", (), {"scope": {"type": "http"}})()
 
     with pytest.raises((InvalidAuthHttp, UnauthorizedHttp)) as exc_info:
         raise InvalidAuth("test message", http_conn)
@@ -50,7 +51,7 @@ def test_legacy_exception_catching():
     assert exc_info.value.detail == {"error": "invalid_token", "message": "test message"}
 
     # Test WebSocket exceptions
-    ws_conn = type('HTTPConnection', (), {'scope': {'type': 'websocket'}})()
+    ws_conn = type("HTTPConnection", (), {"scope": {"type": "websocket"}})()
 
     with pytest.raises((InvalidAuthWebSocket, UnauthorizedWebSocket)) as exc_info:
         raise InvalidAuth("test message", ws_conn)

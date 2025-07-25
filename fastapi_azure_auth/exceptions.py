@@ -26,7 +26,7 @@ class UnauthorizedHttp(HTTPException):
     """HTTP exception for authentication failures"""
 
     def __init__(self, detail: str, authorization_url: str | None = None, client_id: str | None = None) -> None:
-        header_value = 'Bearer'
+        header_value = "Bearer"
         if authorization_url:
             header_value += f', authorization_uri="{authorization_url}"'
         if client_id:
@@ -74,7 +74,7 @@ def InvalidAuth(detail: str, request: HTTPConnection) -> UnauthorizedHttp | Unau
     Returns the correct exception based on the connection type.
     TODO: Remove in v6.0.0
     """
-    if request.scope['type'] == 'http':
+    if request.scope["type"] == "http":
         # Convert the legacy format to new format
         return UnauthorizedHttp(detail)
     return UnauthorizedWebSocket(detail)
@@ -103,7 +103,7 @@ class InvalidAuthWebSocket(UnauthorizedWebSocket):
 
 def InvalidRequest(detail: str, request: HTTPConnection) -> InvalidRequestHttp | InvalidRequestWebSocket:
     """Factory function for invalid request exceptions (HTTP only, as request validation happens pre-connection)"""
-    if request.scope['type'] == 'http':
+    if request.scope["type"] == "http":
         return InvalidRequestHttp(detail)
     return InvalidRequestWebSocket(detail)
 

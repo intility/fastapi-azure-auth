@@ -16,7 +16,7 @@ def single_tenant_app():
     azure_scheme_overrides = SingleTenantAzureAuthorizationCodeBearer(
         app_client_id=settings.APP_CLIENT_ID,
         scopes={
-            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
+            f"api://{settings.APP_CLIENT_ID}/user_impersonation": "User impersonation",
         },
         tenant_id=settings.TENANT_ID,
     )
