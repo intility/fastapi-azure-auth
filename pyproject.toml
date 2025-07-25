@@ -3,7 +3,7 @@ name = "fastapi-azure-auth"
 version = "5.2.0"  # Remember to change in __init__.py as well
 description = "Easy and secure implementation of Azure Entra ID for your FastAPI APIs"
 authors = [{ name = "Jonas Krüger Svensson", email = "jonas.svensson@intility.no" }]
-requires-python = "~=3.8"
+requires-python = ">=3.8.0, <3.9"
 readme = "README.md"
 keywords = [
     "ad",
