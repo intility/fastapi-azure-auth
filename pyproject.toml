@@ -53,7 +53,6 @@ Documentation = "https://github.com/intility/fastapi-azure-auth"
 [dependency-groups]
 dev = [
     "pre-commit>=2.9.3,<3",
-    "black>=22.1.0,<23",
     "pytest>=7.0.1,<8",
     "pytest-cov>=3.0.0,<4",
     "pytest-asyncio>=0.18.2,<0.19",
@@ -77,16 +76,15 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.black]
+[tool.ruff]
 line-length = 120
-skip-string-normalization = true
-target-version = ['py38']
-include = '\.pyi?$'
-exclude = '''
+target-version = 'py38'
+include = ['\.pyi?$']
+exclude = ['''
 (
     (\.eggs|\.git|\.hg|\.mypy_cache|\.tox|\.venv|\venv|\.github|\docs|\tests|\__pycache__)
 )
-'''
+''']
 
 [tool.isort]
 profile = "black"
