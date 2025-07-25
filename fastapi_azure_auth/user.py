@@ -231,7 +231,7 @@ class Claims(BaseModel):
         description='The primary username that represents the user. Only available in V2.0 tokens',
     )
 
-    @field_validator('scp', mode="before")
+    @field_validator('scp', mode='before')
     def scopes_to_list(cls, v: object) -> object:
         """
         Validator on the scope attribute that convert the space separated list

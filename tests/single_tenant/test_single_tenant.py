@@ -307,7 +307,7 @@ async def test_exception_raised(single_tenant_app, mock_openid_and_keys, mocker)
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Unable to process token'}}
     assert response.status_code == 401
-    print(f"header: {response.headers.get('www-authenticate')}")
+    print(f'header: {response.headers.get("www-authenticate")}')
     assert response.headers['www-authenticate'] == 'Bearer'
 
 

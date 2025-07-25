@@ -81,6 +81,8 @@ For a more in-depth tutorial and settings reference you should read the
 pip install fastapi-azure-auth
 # or
 poetry add fastapi-azure-auth
+# or
+uv add fastapi-azure-auth
 ```
 
 #### 2. Configure your FastAPI app

@@ -56,7 +56,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         openapi_token_url: Optional[str] = None,
         openid_config_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
-        scheme_name: str = "AzureAuthorizationCodeBearerBase",
+        scheme_name: str = 'AzureAuthorizationCodeBearerBase',
     ) -> None:
         """
         Initialize settings.
@@ -301,7 +301,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
-        scheme_name: str = "AzureAD_PKCE_single_tenant",
+        scheme_name: str = 'AzureAD_PKCE_single_tenant',
     ) -> None:
         """
         Initialize settings for a single tenant application.
@@ -370,7 +370,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
-        scheme_name: str = "AzureAD_PKCE_multi_tenant",
+        scheme_name: str = 'AzureAD_PKCE_multi_tenant',
     ) -> None:
         """
         Initialize settings for a multi-tenant application.
@@ -446,7 +446,7 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
-        scheme_name: str = "AzureAD_PKCE_B2C_multi_tenant",
+        scheme_name: str = 'AzureAD_PKCE_B2C_multi_tenant',
     ) -> None:
         """
         Initialize settings for a B2C multi-tenant application.
