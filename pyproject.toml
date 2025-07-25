@@ -1,76 +1,81 @@
-[tool.poetry]
+[project]
 name = "fastapi-azure-auth"
-version = "5.1.1"  # Remember to change in __init__.py as well
+version = "5.1.1"
 description = "Easy and secure implementation of Azure Entra ID for your FastAPI APIs"
-authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
+authors = [{ name = "Jonas Krüger Svensson", email = "jonas.svensson@intility.no" }]
+requires-python = "~=3.8"
 readme = "README.md"
-homepage = "https://github.com/intility/fastapi-azure-auth"
-repository = "https://github.com/intility/fastapi-azure-auth"
-documentation = "https://github.com/intility/fastapi-azure-auth"
 keywords = [
-    'ad',
-    'async',
-    'asyncio',
-    'authentication',
-    'azure',
-    'azure ad',
-    'azure entra id',
-    'azure entra',
-    'entra id',
-    'azuread',
-    'fastapi',
-    'multi tenant',
-    'oauth2',
-    'oidc',
-    'security',
-    'single tenant',
-    'starlette',
-    'trio',
+    "ad",
+    "async",
+    "asyncio",
+    "authentication",
+    "azure",
+    "azure ad",
+    "azure entra id",
+    "azure entra",
+    "entra id",
+    "azuread",
+    "fastapi",
+    "multi tenant",
+    "oauth2",
+    "oidc",
+    "security",
+    "single tenant",
+    "starlette",
+    "trio",
 ]
-
 classifiers = [
-    'Development Status :: 5 - Production/Stable',
-    'Environment :: Web Environment',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: MIT License',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3.11',
-    'Topic :: Software Development',
-    'Topic :: Software Development :: Libraries',
-    'Topic :: Software Development :: Libraries :: Application Frameworks',
-    'Topic :: Software Development :: Libraries :: Python Modules',
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "fastapi>0.68.0",
+    "cryptography>=43.0.1",
+    "httpx>0.18.2",
+    "pyjwt>=2.8.0,<3",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-fastapi = ">0.68.0"
-cryptography = ">=43.0.1"
-httpx = ">0.18.2"
-pyjwt = "^2.8.0"
+[project.urls]
+Homepage = "https://github.com/intility/fastapi-azure-auth"
+Repository = "https://github.com/intility/fastapi-azure-auth"
+Documentation = "https://github.com/intility/fastapi-azure-auth"
 
+[dependency-groups]
+dev = [
+    "pre-commit>=2.9.3,<3",
+    "black>=22.1.0,<23",
+    "pytest>=7.0.1,<8",
+    "pytest-cov>=3.0.0,<4",
+    "pytest-asyncio>=0.18.2,<0.19",
+    "pytest-mock>=3.5.1,<4",
+    "requests-mock>=1.8.0,<2",
+    "pytest-socket>=0.4.0,<0.5",
+    "pytest-dotenv>=0.5.2,<0.6",
+    "pytest-aiohttp>=1.0.4,<2",
+    "uvicorn>=0.17.5,<0.18",
+    "pytest-freezer>=0.4.8,<0.5",
+    "anyio>=3.3.4,<4",
+    "trio>=0.22.2,<0.23",
+    "respx>=0.20.1,<0.21",
+    "ipython>=8.2.0,<9",
+    "openapi-spec-validator>=0.6.0,<0.7",
+    "pydantic-settings>=2.0.2,<3",
+    "asgi-lifespan>=2.1.0,<3",
+]
 
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^2.9.3"
-black = "^22.1.0"
-pytest = "^7.0.1"
-pytest-cov = "^3.0.0"
-pytest-asyncio = "^0.18.2"
-pytest-mock = "^3.5.1"
-requests-mock = "^1.8.0"
-pytest-socket = "^0.4.0"
-pytest-dotenv = "^0.5.2"
-pytest-aiohttp = "^1.0.4"
-uvicorn = "^0.17.5"
-pytest-freezer = "^0.4.8"
-anyio = "^3.3.4"
-trio = "^0.22.2"
-respx = "^0.20.1"
-ipython = "^8.2.0"
-openapi-spec-validator = "^0.6.0"
-pydantic-settings = "^2.0.2"
-asgi-lifespan = "^2.1.0"
-
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.black]
 line-length = 120
@@ -95,8 +100,3 @@ sections = [
     'FIRSTPARTY',
     'LOCALFOLDER',
 ]
-
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
