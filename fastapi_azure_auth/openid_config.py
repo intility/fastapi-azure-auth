@@ -1,4 +1,5 @@
 import logging
+from asyncio import Lock
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
@@ -31,28 +32,31 @@ class OpenIdConfig:
         self.token_endpoint: str
         self.issuer: str
 
+        self._refresh_lock: Lock = Lock()
+
     async def load_config(self) -> None:
         """
         Loads config from the Intility openid-config endpoint if it's over 24 hours old (or don't exist)
         """
-        refresh_time = datetime.now() - timedelta(hours=24)
-        if not self._config_timestamp or self._config_timestamp < refresh_time:
-            try:
-                log.debug('Loading Azure Entra ID OpenID configuration.')
-                await self._load_openid_config()
-                self._config_timestamp = datetime.now()
-            except Exception as error:
-                log.exception('Unable to fetch OpenID configuration from Azure Entra ID. Error: %s', error)
-                # We can't fetch an up to date openid-config, so authentication will not work.
-                if self._config_timestamp:
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail='Connection to Azure Entra ID is down. Unable to fetch provider configuration',
-                        headers={'WWW-Authenticate': 'Bearer'},
-                    ) from error
+        async with self._refresh_lock:
+            refresh_time = datetime.now() - timedelta(hours=24)
+            if not self._config_timestamp or self._config_timestamp < refresh_time:
+                try:
+                    log.debug('Loading Azure Entra ID OpenID configuration.')
+                    await self._load_openid_config()
+                    self._config_timestamp = datetime.now()
+                except Exception as error:
+                    log.exception('Unable to fetch OpenID configuration from Azure Entra ID. Error: %s', error)
+                    # We can't fetch an up to date openid-config, so authentication will not work.
+                    if self._config_timestamp:
+                        raise HTTPException(
+                            status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail='Connection to Azure Entra ID is down. Unable to fetch provider configuration',
+                            headers={'WWW-Authenticate': 'Bearer'},
+                        ) from error
 
-                else:
-                    raise RuntimeError(f'Unable to fetch provider information. {error}') from error
+                    else:
+                        raise RuntimeError(f'Unable to fetch provider information. {error}') from error
 
             log.info('fastapi-azure-auth loaded settings from Azure Entra ID.')
             log.info('authorization endpoint: %s', self.authorization_endpoint)
